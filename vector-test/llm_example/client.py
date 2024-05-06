@@ -20,14 +20,17 @@ class VectorDatabase:
         if schema is None:
             schema = self.create_schema(dim=vector_dim)
 
-        self._create_collection(collection_name=collection_name, schema=schema)
+        if not self.client.has_collection(collection_name=collection_name):
+            self._create_collection(collection_name=collection_name, schema=schema)
+
+        self.last_id = self.get_count()
 
     def insert(self, data: list[dict]) -> dict:
         response = self.client.insert(collection_name=self.collection_name, data=data)
 
         return response
 
-    def search(self, query: list[dict], limit: int = 5) -> list[list[dict]]:
+    def search(self, query: list[list], limit: int = 5) -> list[list[dict]]:
         response = self.client.search(
             collection_name=self.collection_name,
             data=query,
@@ -35,6 +38,23 @@ class VectorDatabase:
         )
 
         return response
+
+    def get_entries(self, ids: list[int]) -> list[dict]:
+        res = self.client.get(
+            collection_name=self.collection_name,
+            ids=ids,
+            output_fields=["role", "content"]
+        )
+
+        return res
+    
+    def get_count(self) -> int:
+        res = self.client.query(
+            collection_name=self.collection_name,
+            output_fields=["count(*)"]
+        )
+
+        return res[0]['count(*)']
 
     def create_schema(self, dim: int) -> CollectionSchema:
         """Creates an example schema for mivus"""
@@ -46,8 +66,8 @@ class VectorDatabase:
 
         schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
         schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=dim)
-        schema.add_field(field_name="comment", datatype=DataType.VARCHAR, max_length=48000)
-        schema.add_field(field_name="url", datatype=DataType.VARCHAR, max_length=1024)
+        schema.add_field(field_name="role", datatype=DataType.VARCHAR, max_length=128)
+        schema.add_field(field_name="content", datatype=DataType.VARCHAR, max_length=4096)
 
         return schema
 
@@ -72,7 +92,4 @@ class VectorDatabase:
 if __name__ == "__main__":
     db = VectorDatabase(collection_name="karakara", vector_dim=768)
 
-    # del db
-
-    # print("sleeping..")
-    # time.sleep(60)
+    print("Done")

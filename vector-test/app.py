@@ -76,7 +76,7 @@ res = client.insert(
 
 
 # Dev - score test
-test_vectors = get_text_embedding("Heeeey there karakara. She is my lovely cat.")
+test_vectors = get_text_embedding("Heeeey there.")
 
 res = client.insert(
     collection_name=COLLECTION_NAME,

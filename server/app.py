@@ -81,6 +81,4 @@ def dev():
 
 
 # if __name__ == "__main__":
-#     # karakara = 0
-
 #     app.run(debug=True)

@@ -6,7 +6,7 @@ from llama.tokenizer import Tokenizer
 
 class LlmApp:
     def __init__(self) -> None:
-        self.max_seq_len = 40
+        self.max_seq_len = 4096
 
         self.generator = Llama.build(
             ckpt_dir="Meta-Llama-3-8B-Instruct/",
@@ -31,13 +31,13 @@ class LlmApp:
     def call(self, dialogs: list[Dialog]) -> str:
         token_count = self.calc_token_size(dialogs)
 
-        if token_count > self.max_seq_len:
+        # if token_count > self.max_seq_len:
 
-            print('token size has surpassed')
+        #     print('token size has surpassed')
 
-            while token_count > self.max_seq_len:
-                dialogs[0].pop(0)
-                token_count = self.calc_token_size(dialogs)
+        #     while token_count > self.max_seq_len:
+        #         dialogs[0].pop(0)
+        #         token_count = self.calc_token_size(dialogs)
 
         results = self.generator.chat_completion(
             dialogs,
@@ -56,14 +56,10 @@ if __name__ == "__main__":
     os.environ["MASTER_ADDR"] = "127.0.0.1"
     os.environ["MASTER_PORT"] = "29500"
 
-    dialogs = [[{"role": "user", "content": "Hi there, what is your name?"}]]
+    dialogs = [[{"role": "user", "content": "Hi there"}]]
 
     dev_app = LlmApp()
 
     response = dev_app.call(dialogs)
 
-    dialogs = [[{"role": "user", "content": "Hi there, what is your name? asdf asd fasd fasd fasd fasd fas dfasd fasd  asd fasdf asdf asd fasdf as dfasd fasd fasd fasdfas dfasd fasd fasdffasd fasd fs asd fasdf"}]]
-
-    response = dev_app.call(dialogs)
-
-    print("de")
+    print("Done")
